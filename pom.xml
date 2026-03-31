@@ -17,7 +17,7 @@
     <packaging>jar</packaging>
     <name>SpringJavaFXGraal</name>
     <description>Demo of a minimal native image app built with Spring Boot, JDBC, JavaFX, AtlantaFX, and GraalVM.</description>
-    <url>https://github.com/BryanL43/FFGInventoryManager</url>
+    <url>https://github.com/BryanL43/SpringJavaFXGraal</url>
     <licenses>
         <license/>
     </licenses>

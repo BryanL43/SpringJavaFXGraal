@@ -80,10 +80,10 @@ powershell -Command "Start-Process 'C:\ProgramData\Microsoft\Windows\Start Menu\
 - Search for `x64 Native Tools Command Prompt for VS 2022`
 - Right click, select **Run as administrator**
 
-[!NOTE]
+> [!NOTE]
 > The installation path varies based on your Visual Studio setup.
 
-[!IMPORTANT]
+> [!IMPORTANT]
 > Run all subsequent commands in the x64 Native Tools Command Prompt.
 
 2. **Navigate to project directory:**
@@ -104,7 +104,7 @@ java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/
 ```
 Interact with the application UI and exercise all features to capture complete metadata.
 
-[!NOTE]
+> [!NOTE]
 > Update the JAR name if the artifact name or version changes.
 
 4. **Build native executable:**
@@ -114,6 +114,11 @@ Interact with the application UI and exercise all features to capture complete m
 
 ### Optional
 Skip tests by adding `-DskipTests` to any of the above Maven command.
+
+## Demo Video
+<video src="https://raw.githubusercontent.com/BryanL43/SpringJavaFXGraal/main/asset/SpringJavaFXGraal-Demo.mp4" controls width="800"></video>
+> [!NOTE]
+> A video to show the usage. Database setup instructions are not included.
 
 ## Cautionary Tale
 Why use Spring Boot JDBC instead of JPA?
