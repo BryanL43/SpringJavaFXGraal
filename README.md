@@ -116,7 +116,7 @@ Interact with the application UI and exercise all features to capture complete m
 Skip tests by adding `-DskipTests` to any of the above Maven command.
 
 ## Demo Video
-<video src="https://raw.githubusercontent.com/BryanL43/SpringJavaFXGraal/main/asset/SpringJavaFXGraal-Demo.mp4" controls width="800"></video>
+[Watch demo](https://drive.google.com/file/d/1pB09Dx_yZi2xPBBKaJPoTiz0n7HcAt6M/view)
 > [!NOTE]
 > A video to show the usage. Database setup instructions are not included.
 
