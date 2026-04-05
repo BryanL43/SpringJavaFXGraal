@@ -11,6 +11,7 @@ It includes Spring Boot JDBC for data access and optional AtlantaFX styling.
 - GraalVM 25, Windows x64
 - Spring Boot 4.0.4
 - JavaFX 22
+- PostgreSQL 42.7.3
 
 ## Installation
 
@@ -91,14 +92,19 @@ powershell -Command "Start-Process 'C:\ProgramData\Microsoft\Windows\Start Menu\
 cd <your-repo-directory>
 ```
 
-2. **Build the application JAR:**
+3. **Build the application JAR:**
 ```cmd
 .\mvnw clean install
 ```
 Run and test the application using the generated JAR.
 This ensures JavaFX dependencies are packaged correctly and avoids the “JavaFX runtime components are missing” error.
 
-3. **Run the tracing agent to collect reachability metadata:**
+4. **Run Spring Boot AOT to generate native artifacts:**
+```cmd
+.\mvnw -Pnative spring-boot:process-aot
+```
+
+5. **Run the tracing agent to collect reachability metadata:**
 ```cmd
 java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar target\example-1.0.0.jar
 ```
@@ -107,7 +113,7 @@ Interact with the application UI and exercise all features to capture complete m
 > [!NOTE]
 > Update the JAR name if the artifact name or version changes.
 
-4. **Build native executable:**
+6. **Build native executable:**
 ```cmd
 .\mvnw -Pnative native:compile
 ```
