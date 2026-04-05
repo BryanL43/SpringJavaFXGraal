@@ -40,3 +40,6 @@ build/
 logs/
 *.log
 dependency-reduced-pom.xml
+
+### GraalVM metadata ###
+**/META-INF/.native-image/reachability-metadata.json

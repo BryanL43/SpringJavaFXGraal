@@ -1,0 +1,37 @@
+# application.yml - PostgreSQL optimized
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dev
+    jdbcUrl: ${spring.datasource.url}
+    username: dev
+    password: dev
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      # PostgreSQL performance tuning
+      data-source-properties:
+        # Enable prepared statement caching
+        preparedStatementCacheQueries: 256
+        preparedStatementCacheSizeMiB: 5
+
+        # Enable binary transfer mode for better performance
+        binaryTransfer: true
+
+        # Socket timeout (prevents hanging connections)
+        socketTimeout: 30
+
+        # Connection timeout for establishing connection
+        connectTimeout: 10
+
+        # TCP keepalive
+        tcpKeepAlive: true
+
+  # Skip automatic database initialization (i.e. schema.sql lookup)
+  sql:
+    init:
+      mode: never
+
+# Debug configs
+logging:
+  level:
+    com.zaxxer.hikari: DEBUG

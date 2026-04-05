@@ -16,16 +16,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
+
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
-
-import org.custom.example.entity.Airline;
-import org.custom.example.repository.AirlineRepository;
+import org.custom.example.entity.Item;
+import org.custom.example.repository.ItemRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,39 +86,38 @@ public class App extends Application {
         root.getStyleClass().add("main");
         root.setAlignment(Pos.CENTER);
 
-        Label airlineLabel = new Label("Click the button");
-        Button button = new Button("Get Random Airline");
+        Label outputLabel = new Label("Click the button");
+        Button button = new Button("Get Random Item");
 
-        AirlineRepository repo = context.getBean(AirlineRepository.class);
+        ItemRepository repo = context.getBean(ItemRepository.class);
 
         button.setOnAction(e -> {
             button.setDisable(true);
 
-            Task<Airline> task = new Task<>() {
+            Task<Item> task = new Task<>() {
                 @Override
-                protected Airline call() {
-                    var airlines = repo.findAll();
-
-                    if (airlines.isEmpty()) {
+                protected Item call() {
+                    var items = repo.findAll();
+                    if (items.isEmpty()) {
                         return null;
                     }
 
-                    int index = new Random().nextInt(airlines.size());
-                    return airlines.get(index);
+                    int index = new Random().nextInt(items.size());
+                    return items.get(index);
                 }
             };
 
             task.setOnSucceeded(event -> {
-                Airline airline = task.getValue();
-                airlineLabel.setText(
-                    airline != null ? airline.getName() : "No airlines found"
+                Item item = task.getValue();
+                outputLabel.setText(
+                    item != null ? item.getItemDescription() : "No items found"
                 );
                 button.setDisable(false);
             });
 
             task.setOnFailed(event -> {
-                logger.error("Error fetching airline", task.getException());
-                airlineLabel.setText("Error!");
+                logger.error("Error fetching item", task.getException());
+                outputLabel.setText("Error!");
                 button.setDisable(false);
             });
 
@@ -130,7 +129,7 @@ public class App extends Application {
         root.getChildren().addAll(
             new FontIcon(MaterialDesignS.SCHOOL),
             button,
-            airlineLabel
+            outputLabel
         );
 
         return root;
