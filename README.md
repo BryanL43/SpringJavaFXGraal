@@ -64,47 +64,24 @@ Java HotSpot(TM) 64-Bit Server VM Oracle GraalVM 25.0.2+10.1 (build 25.0.2+10-LT
 > The application runs as a native executable and does not require a separate JVM.
 
 ## Usage
-1. **Open x64 Native Tools Command Prompt for VS 2022 as `Administrator`:**
-
-**PowerShell**
-```ps1
-Start-Process "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2022\Visual Studio Tools\VC\x64 Native Tools Command Prompt for VS 2022.lnk" -Verb RunAs
-```
-
-**Command Prompt**
-```cmd
-powershell -Command "Start-Process 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2022\Visual Studio Tools\VC\x64 Native Tools Command Prompt for VS 2022.lnk' -Verb RunAs"
-```
-
-**Windows Search**
-- Open Start Menu
-- Search for `x64 Native Tools Command Prompt for VS 2022`
-- Right click, select **Run as administrator**
-
-> [!NOTE]
-> The installation path varies based on your Visual Studio setup.
-
-> [!IMPORTANT]
-> Run all subsequent commands in the x64 Native Tools Command Prompt.
-
-2. **Navigate to project directory:**
+1. **Navigate to project directory:**
 ```cmd
 cd <your-repo-directory>
 ```
 
-3. **Build the application JAR:**
+2. **Build the application JAR:**
 ```cmd
 .\mvnw clean install
 ```
 Run and test the application using the generated JAR.
 This ensures JavaFX dependencies are packaged correctly and avoids the “JavaFX runtime components are missing” error.
 
-4. **Run Spring Boot AOT to generate native artifacts:**
+3. **Run Spring Boot AOT to generate native artifacts:**
 ```cmd
 .\mvnw -Pnative spring-boot:process-aot
 ```
 
-5. **Run the tracing agent to collect reachability metadata:**
+4. **Run the tracing agent to collect reachability metadata:**
 ```cmd
 java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar target\example-1.0.0.jar
 ```
@@ -113,7 +90,7 @@ Interact with the application UI and exercise all features to capture complete m
 > [!NOTE]
 > Update the JAR name if the artifact name or version changes.
 
-6. **Build native executable:**
+5. **Build native executable:**
 ```cmd
 .\mvnw -Pnative native:compile
 ```
