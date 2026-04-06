@@ -128,12 +128,10 @@
         </dependency>
     </dependencies>
 
-    <!--
-        Packages the application as an executable Spring Boot jar.
-        Mainly use for development.
-    -->
+    <!-- Defines how the application is built and executed -->
     <build>
         <plugins>
+            <!-- Packages the application as an executable Spring Boot jar -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -149,6 +147,26 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!--
+                Provides JavaFX runtime support suitable for development.
+                Use: .\mvnw javafx:run
+             -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+
+                    <!-- Hides the warnings; does not affect anything -->
+                    <options>
+                        <option>--enable-native-access=javafx.graphics</option>
+                        <option>--sun-misc-unsafe-memory-access=allow</option>
+                    </options>
+                </configuration>
             </plugin>
         </plugins>
     </build>
