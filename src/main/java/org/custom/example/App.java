@@ -33,7 +33,8 @@ import org.slf4j.LoggerFactory;
 @SpringBootApplication
 public class App extends Application {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
-    private static ConfigurableApplicationContext context;
+
+    public static ConfigurableApplicationContext context;
 
     private static final String ASSETS_DIR = "/assets/";
     private static final String APP_ICON_PATH = Objects.requireNonNull(
@@ -87,7 +88,10 @@ public class App extends Application {
         root.setAlignment(Pos.CENTER);
 
         Label outputLabel = new Label("Click the button");
+        outputLabel.setId("outputLabel");
+
         Button button = new Button("Get Random Item");
+        button.setId("getRandomItemBtn");
 
         ItemRepository repo = context.getBean(ItemRepository.class);
 

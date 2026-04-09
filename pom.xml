@@ -34,6 +34,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- Dependencies versions -->
         <javafx.version>22</javafx.version> <!-- Stable version for AtlantaFX -->
         <controlsfx.version>11.2.3</controlsfx.version>
 
@@ -41,10 +42,13 @@
         <lib.ikonli.version>12.3.1</lib.ikonli.version>
         <lib.jspecify.version>1.0.0</lib.jspecify.version>
 
-        <!-- Dependencies version compatibility with GraalVM reachability metadata -->
         <postgresql.version>42.7.3</postgresql.version>
 
-        <!-- Additional properties -->
+        <!-- Test dependencies versions -->
+        <testfx.version>4.0.18</testfx.version>
+        <openjfx.monocle.version>21.0.2</openjfx.monocle.version>
+
+        <!-- Plugin versions -->
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
         <gluonfx.maven.plugin.version>1.0.28</gluonfx.maven.plugin.version>
 
@@ -126,12 +130,32 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>${testfx.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>${testfx.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>openjfx-monocle</artifactId>
+            <version>${openjfx.monocle.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
-    <!-- Defines how the application is built and executed -->
     <build>
         <plugins>
-            <!-- Packages the application as an executable Spring Boot jar -->
+            <!--
+                Packages the application as an executable Spring Boot jar.
+                Use: mvn install
+            -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -150,8 +174,27 @@
             </plugin>
 
             <!--
+                Enables headless TestFX for standard build tests.
+                Disabled in the native profile, since the GraalVM tracing agent
+                requires a real UI and runs on-top of the tests.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+
+                <configuration>
+                    <argLine>
+                        -Djava.awt.headless=true
+                        -Dtestfx.robot=glass
+                        -Dtestfx.headless=true
+                        -Dprism.order=sw
+                    </argLine>
+                </configuration>
+            </plugin>
+
+            <!--
                 Provides JavaFX runtime support suitable for development.
-                Use: .\mvnw javafx:run
+                Use: mvn javafx:run
              -->
             <plugin>
                 <groupId>org.openjfx</groupId>
@@ -171,17 +214,22 @@
         </plugins>
     </build>
 
-    <!--
-        Use with -Pnative.
-        Builds a GraalVM native executable instead of a standard JVM jar.
-    -->
     <profiles>
+        <!--
+            Native build profile.
+            Activate with -Pnative to compile the app into a GraalVM native binary
+            instead of producing a standard JVM jar.
+        -->
         <profile>
             <id>native</id>
 
             <build>
                 <plugins>
-                    <!-- Spring AOT -->
+                    <!--
+                        Runs Spring Boot ahead-of-time (AOT) optimized code required for native image builds.
+                        Can be invoked with spring-boot:process-aot,
+                        either standalone or as part of a full build.
+                    -->
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -195,7 +243,27 @@
                         </executions>
                     </plugin>
 
-                    <!-- GraalVM native -->
+                    <!--
+                        Runs tests with the GraalVM native-image tracing agent.
+                        Captures runtime reflection and resource usage during tests.
+                        Writes generated metadata to META-INF/native-image for native builds.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+
+                        <configuration>
+                            <argLine>
+                                -agentlib:native-image-agent=config-output-dir=${project.basedir}/src/main/resources/META-INF/native-image
+                            </argLine>
+                        </configuration>
+                    </plugin>
+
+                    <!--
+                        GraalVM native image build plugin.
+                        Invoke with native:compile.
+                        Compiles the application into a standalone executable.
+                    -->
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
@@ -204,11 +272,19 @@
                             <mainClass>${main.class}</mainClass>
 
                             <buildArgs>
+                                <!-- Optimization level: balanced build time and runtime performance -->
                                 <buildArg>-Ob</buildArg>
+
+                                <!-- Fail build instead of falling back to JVM mode -->
                                 <buildArg>--no-fallback</buildArg>
+
+                                <!-- Allow reflection/native access for unnamed modules -->
                                 <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
 
+                                <!-- Include full stack traces for easier debugging -->
                                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+
+                                <!-- Bundle static resources matching this pattern into the binary -->
                                 <buildArg>-H:IncludeResources=assets/.*</buildArg>
                             </buildArgs>
                         </configuration>
