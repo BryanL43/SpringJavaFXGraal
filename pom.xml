@@ -216,12 +216,12 @@
 
     <profiles>
         <!--
-            Native build profile.
-            Activate with -Pnative to compile the app into a GraalVM native binary
-            instead of producing a standard JVM jar.
+            Native tracing profile.
+            Activate with -Pnative-trace to run AOT processing and tests with attached GraalVM agent.
+            Generates metadata for use in the native build.
         -->
         <profile>
-            <id>native</id>
+            <id>native-trace</id>
 
             <build>
                 <plugins>
@@ -233,7 +233,6 @@
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
-
                         <executions>
                             <execution>
                                 <goals>
@@ -258,9 +257,31 @@
                             </argLine>
                         </configuration>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
+            Native build profile.
+            Activate with -Pnative to compile the app into a GraalVM native binary
+            instead of producing a standard JVM jar.
+        -->
+        <profile>
+            <id>native</id>
+
+            <build>
+                <plugins>
+                    <!-- Skip redundant tests during native build -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
 
                     <!--
-                        GraalVM native image build plugin.
+                        GraalVM native image build.
                         Invoke with native:compile.
                         Compiles the application into a standalone executable.
                     -->
