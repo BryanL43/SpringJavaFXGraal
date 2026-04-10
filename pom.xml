@@ -50,7 +50,6 @@
 
         <!-- Plugin versions -->
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
-        <gluonfx.maven.plugin.version>1.0.28</gluonfx.maven.plugin.version>
 
         <main.class>org.custom.example.App</main.class>
     </properties>
@@ -154,7 +153,7 @@
         <plugins>
             <!--
                 Packages the application as an executable Spring Boot jar.
-                Use: mvn install
+                Use: mvn package
             -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -174,9 +173,9 @@
             </plugin>
 
             <!--
-                Enables headless TestFX for standard build tests.
-                Disabled in the native profile, since the GraalVM tracing agent
-                requires a real UI and runs on-top of the tests.
+                Enables headless TestFX for standard tests.
+                Disabled in native profile since the GraalVM tracing agent
+                requires a real UI.
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -199,7 +198,7 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
+                <version>${javafx.maven.plugin.version}</version>
 
                 <configuration>
                     <mainClass>${main.class}</mainClass>
@@ -217,36 +216,18 @@
     <profiles>
         <!--
             Native tracing profile.
-            Activate with -Pnative-trace to run AOT processing and tests with attached GraalVM agent.
-            Generates metadata for use in the native build.
+
+            Usage:
+            mvn test -Pnative-trace
+
+            Runs tests with GraalVM tracing agent to generate native metadata.
         -->
         <profile>
             <id>native-trace</id>
 
             <build>
                 <plugins>
-                    <!--
-                        Runs Spring Boot ahead-of-time (AOT) optimized code required for native image builds.
-                        Can be invoked with spring-boot:process-aot,
-                        either standalone or as part of a full build.
-                    -->
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>process-aot</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!--
-                        Runs tests with the GraalVM native-image tracing agent.
-                        Captures runtime reflection and resource usage during tests.
-                        Writes generated metadata to META-INF/native-image for native builds.
-                    -->
+                    <!-- Attaches GraalVM tracing agent to tests -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -263,7 +244,11 @@
 
         <!--
             Native build profile.
-            Activate with -Pnative to compile the app into a GraalVM native binary
+
+            Usage:
+            mvn package -Pnative
+
+            Runs AOT processing and builds the native executable
             instead of producing a standard JVM jar.
         -->
         <profile>
@@ -281,9 +266,25 @@
                     </plugin>
 
                     <!--
-                        GraalVM native image build.
-                        Invoke with native:compile.
-                        Compiles the application into a standalone executable.
+                        Runs Spring Boot ahead-of-time (AOT) optimized code required
+                        for native image builds.
+                    -->
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>process-aot</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!--
+                        Builds the GraalVM native image using AOT output and generated metadata.
+                        Produces a standalone executable.
                     -->
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
@@ -305,10 +306,21 @@
                                 <!-- Include full stack traces for easier debugging -->
                                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>
 
+                                <!-- Unlock experimental for -H:IncludeResources future -->
+                                <buildArg>'-H:+UnlockExperimentalVMOptions</buildArg>
+
                                 <!-- Bundle static resources matching this pattern into the binary -->
                                 <buildArg>-H:IncludeResources=assets/.*</buildArg>
                             </buildArgs>
                         </configuration>
+
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
