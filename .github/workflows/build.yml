@@ -22,6 +22,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Determine tag
         id: tag
@@ -32,7 +34,29 @@ jobs:
           } elseif ("${{ github.event.inputs.tag }}") {
             $tag = "${{ github.event.inputs.tag }}"
           } else {
-            $tag = "v0.0.${{ github.run_number }}"
+            git fetch --tags
+
+            $tags = git tag -l "v1.0.*"
+
+            if (-not $tags) {
+              $tag = "v1.0.0"
+            } else {
+              $numbers = $tags |
+                ForEach-Object {
+                  if ($_ -match '^v1\.0\.(\d+)$') {
+                    [int]$matches[1]
+                  }
+                } |
+                Where-Object { $_ -ne $null }
+
+              if (-not $numbers) {
+                $tag = "v1.0.0"
+              } else {
+                $max = ($numbers | Measure-Object -Maximum).Maximum
+                $next = $max + 1
+                $tag = "v1.0.$next"
+              }
+            }
           }
 
           Write-Host "Using tag: $tag"
