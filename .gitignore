@@ -39,6 +39,7 @@ build/
 .env
 logs/
 *.log
+.run/Application.run.xml
 dependency-reduced-pom.xml
 
 ### GraalVM metadata ###

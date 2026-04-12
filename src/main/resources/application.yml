@@ -1,9 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/dev
+    # Required by HikariCP because url and jdbcUrl are treated as separate properties
     jdbcUrl: ${spring.datasource.url}
-    username: dev
-    password: dev
+
     driver-class-name: org.postgresql.Driver
 
     hikari:
