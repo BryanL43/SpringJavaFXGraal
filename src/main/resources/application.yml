@@ -1,3 +1,6 @@
+# NOTE: spring datasource url, username, & password must be supplied at runtime.
+# Please refer to `.run/README.md` for more information.
+
 spring:
   datasource:
     # Required by HikariCP because url and jdbcUrl are treated as separate properties

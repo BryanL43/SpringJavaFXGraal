@@ -1,0 +1,54 @@
+name: Build Windows Native Executable
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm'
+          cache: 'maven'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and test
+        run: .\mvnw -B clean verify
+
+      - name: Run tracing agent
+        run: .\mvnw -B test -Pnative-trace
+
+      - name: Build native executable
+        run: .\mvnw -B package -Pnative
+
+      - name: Locate executable
+        id: find_exe
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path target -Filter *.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+          if (!$exe) {
+            Write-Error "No .exe found in target directory"
+            exit 1
+          }
+
+          Write-Host "Found executable: $($exe.FullName)"
+
+          # Export for later steps
+          echo "exe_path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.find_exe.outputs.exe_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
