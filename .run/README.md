@@ -1,6 +1,6 @@
 # Run Configuration
 
-This directory contains IntelliJ run configurations for ease of use.
+This directory contains an optional IntelliJ run configurations for ease of use.
 
 ## Setup
 1. Copy the example file:
@@ -14,9 +14,9 @@ Application.run.xml.example → Application.run.xml
 ```xml
 <option name="environmentProperties">
   <map>
-    <entry key="SPRING_DATASOURCE_PASSWORD" value="your_password" />
-    <entry key="SPRING_DATASOURCE_URL" value="your_jdbc_url" />
+    <entry key="SPRING_DATASOURCE_JDBCURL" value="your_jdbc_url" />
     <entry key="SPRING_DATASOURCE_USERNAME" value="your_username" />
+    <entry key="SPRING_DATASOURCE_PASSWORD" value="your_password" />
   </map>
 </option>
 ```

@@ -16,7 +16,7 @@ jobs:
     permissions:
       contents: write
     env:
-      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+      SPRING_DATASOURCE_JDBCURL: ${{ secrets.SPRING_DATASOURCE_JDBCURL }}
       SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
       SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
 

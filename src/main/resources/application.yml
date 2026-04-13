@@ -1,11 +1,11 @@
-# NOTE: spring datasource url, username, & password must be supplied at runtime.
-# Please refer to `.run/README.md` for more information.
+# NOTE: Database credentials must be provided via environment variables at runtime.
+# Refer to `.run/README.md` for IntelliJ setup and root README Usage section for compiling.
 
 spring:
-  datasource:
-    # Required by HikariCP because url and jdbcUrl are treated as separate properties
-    jdbcUrl: ${spring.datasource.url}
+  main:
+    banner-mode: off
 
+  datasource:
     driver-class-name: org.postgresql.Driver
 
     hikari:

@@ -7,7 +7,7 @@
           <option name="delegateBuildToMaven" value="false" />
           <option name="environmentProperties">
             <map>
-              <entry key="SPRING_DATASOURCE_URL" value="XXX" />
+              <entry key="SPRING_DATASOURCE_JDBCURL" value="XXX" />
               <entry key="SPRING_DATASOURCE_USERNAME" value="XXX" />
               <entry key="SPRING_DATASOURCE_PASSWORD" value="XXX" />
             </map>
