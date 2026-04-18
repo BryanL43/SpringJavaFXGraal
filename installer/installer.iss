@@ -26,9 +26,16 @@ Compression=lzma2
 SolidCompression=yes
 LZMANumBlockThreads=2
 
+// Assets
+WizardImageFile=installer\assets\banner.bmp
+WizardSmallImageFile=installer\assets\logo.bmp
+SetupIconFile=installer\assets\logo.ico
+
 LicenseFile=LICENSE
 
 [Messages]
+SetupWindowTitle={#MyAppName} {#MyAppVersion} Setup
+
 WelcomeLabel1=Welcome to the {#MyAppName} {#MyAppVersion} Setup Wizard
 WelcomeLabel2=The Setup Wizard will install {#MyAppName} {#MyAppVersion} on your computer. Click Next to continue, or Cancel to exit the Setup Wizard.
 ClickNext=
@@ -58,17 +65,17 @@ var
   LeftOffset: Integer;
 begin
   WizardForm.WizardBitmapImage.Width := ScaleX(165);
-  
+
   // Calculate new left offset
   LeftOffset :=
     WizardForm.WizardBitmapImage.Left +
     WizardForm.WizardBitmapImage.Width +
     ScaleX(15);
-  
+
   // Shift the Welcome page text left
   WizardForm.WelcomeLabel1.Left := LeftOffset;
   WizardForm.WelcomeLabel2.Left := LeftOffset;
-  
+
   // Shift the Welcome page text down
   WizardForm.WelcomeLabel1.Top := WizardForm.WelcomeLabel1.Top + ScaleY(3);
   WizardForm.WelcomeLabel2.Top := WizardForm.WelcomeLabel2.Top + ScaleY(10);
@@ -76,7 +83,7 @@ begin
   // Expand the Welcome page text width
   WizardForm.WelcomeLabel1.Width := WizardForm.ClientWidth - LeftOffset - ScaleX(15);
   WizardForm.WelcomeLabel2.Width := WizardForm.ClientWidth - LeftOffset - ScaleX(15);
-    
+
   // Change Welcome page heading font size & remove bold
   WizardForm.WelcomeLabel1.Font.Size := 13;
   WizardForm.WelcomeLabel1.Font.Style :=
@@ -88,25 +95,25 @@ var
   LeftOffset: Integer;
 begin
   WizardForm.WizardBitmapImage2.Width := ScaleX(165);
-  
+
   // Calculate new left offset
   LeftOffset :=
     WizardForm.WizardBitmapImage2.Left +
     WizardForm.WizardBitmapImage2.Width +
     ScaleX(15);
-  
+
   // Shift the Finished page components left
   WizardForm.FinishedHeadingLabel.Left := LeftOffset;
   WizardForm.FinishedLabel.Left := LeftOffset;
   WizardForm.RunList.Left := LeftOffset;
-  
+
   // Shift the Finished page heading down
   WizardForm.FinishedHeadingLabel.Top := WizardForm.FinishedHeadingLabel.Top + ScaleY(2);
 
   // Expand the Finished page text width
   WizardForm.FinishedHeadingLabel.Width := WizardForm.ClientWidth - LeftOffset - ScaleX(15);
   WizardForm.FinishedLabel.Width := WizardForm.ClientWidth - LeftOffset - ScaleX(15);
-    
+
   // Change Finished page heading font size & remove bold
   WizardForm.FinishedHeadingLabel.Font.Size := 13;
   WizardForm.FinishedHeadingLabel.Font.Style :=
@@ -120,6 +127,11 @@ begin
   WizardForm.Width := ScaleX(510);
   WizardForm.Height := ScaleY(395);
   
+  // Change the Main Panel background & text color to match banner
+  WizardForm.MainPanel.Color := $3A221D; // $BBGGRR format
+  WizardForm.PageNameLabel.Font.Color := clWhite;
+  WizardForm.PageDescriptionLabel.Font.Color := clWhite;
+
   AdjustWelcomePage;
   AdjustFinishedPage;
 end;
@@ -154,14 +166,14 @@ end;
 procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
 begin
   Confirm := False; // Suppress dialog
-  
-  // Immediately close the app if "Finished" (Cancel) is clicked 
+
+  // Immediately close the app if "Finished" (Cancel) is clicked
   // on the Interrupt page
   if InterruptedPageActive then begin
     Cancel := True; // Allow setup termination
     Exit;
   end;
-  
+
   // Cancellation yes/no dialog
   if MsgBox(
     ExpandConstant('Are you sure you want to cancel {#MyAppName} {#MyAppVersion} installation?'),
