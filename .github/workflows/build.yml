@@ -72,14 +72,23 @@ jobs:
           git tag ${{ steps.tag.outputs.tag }}
           git push origin ${{ steps.tag.outputs.tag }}
 
+      - name: Cache Maven repository
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: '25'
           distribution: 'graalvm'
-          cache: 'maven'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Embed datasource credentials for a locally hosted database instance.
+      # If the database is hosted behind a service,
+      # remove this and load credentials from that service.
       - name: Generate application-prod.yml
         shell: pwsh
         run: |
@@ -104,12 +113,10 @@ jobs:
         id: find_exe
         shell: pwsh
         run: |
-          $exe = Get-ChildItem -Path target -Filter *.exe -Recurse |
-            Where-Object { $_.Name -notlike "*Installer*" } |
+          $exe = Get-ChildItem -Path target -Filter *.exe -Recurse -ErrorAction SilentlyContinue |
             Select-Object -First 1
-
           if (!$exe) {
-            Write-Error "No .exe found in target directory"
+            Write-Error "Native executable not found in target directory"
             exit 1
           }
 
@@ -117,9 +124,6 @@ jobs:
 
           # Export for later steps
           echo "exe_path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
-
-      - name: Install Inno Setup
-        run: choco install innosetup -y
 
       - name: Build installer
         shell: pwsh
