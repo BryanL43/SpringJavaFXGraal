@@ -21,6 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Tagging example: git tag v1.0.1; git push origin v1.0.1
       - name: Determine tag
         id: tag
         shell: pwsh

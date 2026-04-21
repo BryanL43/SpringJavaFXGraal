@@ -13,6 +13,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testfx.framework.junit5.ApplicationTest;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.testfx.util.WaitForAsyncUtils.waitFor;
 
 @SpringBootTest
@@ -48,6 +49,9 @@ class ApplicationTests extends ApplicationTest {
             .getText();
 
         System.out.println("Label text: " + text);
+
+        assertNotEquals("Error!", text, "Backend failed");
+        assertNotEquals("Click the button", text, "Label did not update");
     }
 
     @AfterAll
