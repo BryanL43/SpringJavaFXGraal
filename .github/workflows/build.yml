@@ -80,8 +80,19 @@ jobs:
           cache: 'maven'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate application-prod.yml
+        shell: pwsh
+        run: |
+          @"
+          spring:
+            datasource:
+              jdbcUrl: ${{ secrets.SPRING_DATASOURCE_JDBCURL }}
+              username: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+              password: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+          "@ | Out-File -Encoding utf8 src/main/resources/application-prod.yml
+
       - name: Build and test
-        run: .\mvnw -B clean verify
+        run: .\mvnw -B clean package
 
       - name: Run tracing agent
         run: .\mvnw -B test -Pnative-trace
@@ -93,7 +104,9 @@ jobs:
         id: find_exe
         shell: pwsh
         run: |
-          $exe = Get-ChildItem -Path target -Filter *.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          $exe = Get-ChildItem -Path target -Filter *.exe -Recurse |
+            Where-Object { $_.Name -notlike "*Installer*" } |
+            Select-Object -First 1
 
           if (!$exe) {
             Write-Error "No .exe found in target directory"
@@ -105,11 +118,30 @@ jobs:
           # Export for later steps
           echo "exe_path=$($exe.FullName)" >> $env:GITHUB_OUTPUT
 
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DMyAppExe="${{ steps.find_exe.outputs.exe_path }}" `
+            installer\installer.iss
+
+      - name: Verify installer exists
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem target\*Installer*.exe
+          if (!$files) {
+            Write-Error "Installer not found"
+            exit 1
+          }
+
       - name: Publish Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Release ${{ steps.tag.outputs.tag }}
-          files: ${{ steps.find_exe.outputs.exe_path }}
+          files: target/*Installer*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

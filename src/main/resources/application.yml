@@ -1,12 +1,19 @@
-# NOTE: Database credentials must be provided via environment variables at runtime.
-# Refer to `.run/README.md` for IntelliJ setup and root README Usage section for compiling.
+# Datasource credentials are loaded from environment variables or the active Spring profile.
+# See the Usage section in the project root README for setup/compilation instructions.
 
 spring:
+  profiles:
+    default: prod
+
   main:
     banner-mode: off
 
   datasource:
     driver-class-name: org.postgresql.Driver
+
+    jdbcUrl: ${SPRING_DATASOURCE_JDBCURL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
     hikari:
       # PostgreSQL performance tuning

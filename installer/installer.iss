@@ -1,6 +1,6 @@
 #define MyAppName "Example"
 #define MyAppVersion "1.0.0"
-#define MyAppExeName "example.exe"
+#define MyAppExeName "Example.exe"
 
 [Setup]
 SourceDir=..
@@ -126,7 +126,7 @@ begin
   // Resize installer size
   WizardForm.Width := ScaleX(510);
   WizardForm.Height := ScaleY(395);
-  
+
   // Change the Main Panel background & text color to match banner
   WizardForm.MainPanel.Color := $3A221D; // $BBGGRR format
   WizardForm.PageNameLabel.Font.Color := clWhite;

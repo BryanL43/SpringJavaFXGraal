@@ -12,7 +12,7 @@
   </parent>
 
   <groupId>org.custom</groupId>
-  <artifactId>example</artifactId>
+  <artifactId>Example</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
   <name>SpringJavaFXGraal</name>
@@ -153,7 +153,9 @@
     <plugins>
       <!--
           Packages the application as an executable Spring Boot jar.
-          Use: mvn package
+
+          Usage:
+          mvn package
       -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -193,7 +195,9 @@
 
       <!--
           Provides JavaFX runtime support suitable for development.
-          Use: mvn javafx:run
+
+          Usage:
+          mvn javafx:run
        -->
       <plugin>
         <groupId>org.openjfx</groupId>
@@ -243,7 +247,7 @@
     </profile>
 
     <!--
-        Native build profile.
+        Native image build profile.
 
         Usage:
         mvn package -Pnative
@@ -306,12 +310,6 @@
                 <!-- Include full stack traces for easier debugging -->
                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>
 
-                <!-- Unlock experimental for -H:IncludeResources future -->
-                <buildArg>'-H:+UnlockExperimentalVMOptions</buildArg>
-
-                <!-- Bundle static resources matching this pattern into the binary -->
-                <buildArg>-H:IncludeResources=assets/.*</buildArg>
-
                 <!--
                   Instructs the Windows linker to build the executable
                   as a GUI application instead of a console application (no console at runtime)
@@ -325,6 +323,13 @@
                   allowing the application to start correctly without requiring WinMain.
                 -->
                 <buildArg>-H:NativeLinkerOption=/ENTRY:mainCRTStartup</buildArg>
+
+                <!-- Unlock experimental for -H:IncludeResources future -->
+                <buildArg>'-H:+UnlockExperimentalVMOptions</buildArg>
+
+                <!-- Bundle static resources matching this pattern into the binary -->
+                <buildArg>-H:IncludeResources=assets/.*</buildArg>
+                <buildArg>-H:IncludeResources=application.*\.yml</buildArg>
               </buildArgs>
             </configuration>
 
