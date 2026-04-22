@@ -117,6 +117,16 @@ Note that it will take control of your I/O because the tracing agent requires a 
 .\mvnw package -Pnative
 ```
 
+7. **Build the installer via CLI (Inno Setup):**
+```cmd
+iscc installer.iss
+```
+
+If `iscc` is not in your PATH, use the full path to the compiler, for example:
+```cmd
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\installer.iss
+```
+
 ### Optional
 Skip tests by adding `-DskipTests` to any of the above Maven command.
 
