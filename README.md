@@ -1,9 +1,14 @@
 # SpringJavaFXGraal
 
 ## Overview
-An extremely minimal demonstration setup for a `Windows` desktop application that combines Spring Boot and JavaFX,
-built with Maven and compiled to a native image using GraalVM.
-It includes Spring Boot JDBC for data access and optional AtlantaFX styling.
+A minimal setup for a `Windows` desktop application compiled to a native image with GraalVM.
+Uses Spring Boot JDBC and JavaFX, and builds with Maven.
+
+Includes:
+- Spring Boot JDBC for data access
+- Optional AtlantaFX styling, remove the dependencies if you are not using it
+- Inno Setup configuration for a custom non-admin installer
+- CI/CD workflow to build and package the installer for release
 
 ## Quick Specifications
 - Windows 10/11 OS
@@ -12,6 +17,7 @@ It includes Spring Boot JDBC for data access and optional AtlantaFX styling.
 - Spring Boot 4.0.4
 - JavaFX 22
 - PostgreSQL 42.7.3
+- Inno Setup 6.7.1
 
 ## Installation
 
@@ -64,39 +70,83 @@ Java HotSpot(TM) 64-Bit Server VM Oracle GraalVM 25.0.2+10.1 (build 25.0.2+10-LT
 > The application runs as a native executable and does not require a separate JVM.
 
 ## Usage
-1. **Navigate to project directory:**
+1. **Navigate to the project directory:**
 ```cmd
 cd <your-repo-directory>
 ```
 
-2. **Build the application JAR:**
+2. **Create the `dev` configuration:**
+
+Copy the example file and rename it:
 ```cmd
-.\mvnw clean install
+cp src\main\resources\application-dev.yml.example src\main\resources\application-dev.yml
 ```
-Run and test the application using the generated JAR.
-This ensures JavaFX dependencies are packaged correctly and avoids the “JavaFX runtime components are missing” error.
+Open `src\main\resources\application-dev.yml` and replace placeholders with your settings.
 
-3. **Run Spring Boot AOT to generate native artifacts:**
+3. **Set active profile (points to dev configuration):**
+
+Powershell:
 ```cmd
-.\mvnw -Pnative spring-boot:process-aot
+$env:SPRING_PROFILES_ACTIVE="dev"
 ```
 
-4. **Run the tracing agent to collect reachability metadata:**
+Command Prompt:
 ```cmd
-java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar target\example-1.0.0.jar
+set SPRING_PROFILES_ACTIVE=dev
 ```
-Interact with the application UI and exercise all features to capture complete metadata.
 
-> [!NOTE]
-> Update the JAR name if the artifact name or version changes.
-
-5. **Build native executable:**
+4. **Build the application JAR:**
 ```cmd
-.\mvnw -Pnative native:compile
+.\mvnw clean package
+```
+Builds the application and runs TestFX tests in headless mode using Monocle.
+
+5. **Generate Spring Ahead-of-Time (AOT) Artifacts and Reachability Metadata:**
+```cmd
+.\mvnw test -Pnative-trace
+```
+
+This attaches the GraalVM tracing agent to TestFX to collect reachability metadata automatically.
+Note that it will take control of your I/O because the tracing agent requires a non-headless UI.
+
+> [!WARNING]
+> Ensure your tests behave like end-to-end tests and exercise **ALL** UI flows through real user interactions.
+
+6. **Build the native executable:**
+```cmd
+.\mvnw package -Pnative
 ```
 
 ### Optional
 Skip tests by adding `-DskipTests` to any of the above Maven command.
+
+### Extra
+For local development, use the run configuration in the `.run` directory or run manually:
+```cmd
+.\mvnw javafx:run
+```
+This builds the JAR and runs the application.
+
+## GitHub Secrets
+
+The CI/CD workflow requires database credentials stored as GitHub Secrets.
+
+1. Go to your repository on GitHub
+2. Open **Settings → Secrets and variables → Actions**
+3. Add the following `Repository secrets`:
+
+- `SPRING_DATASOURCE_JDBCURL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+
+Use the same values as your local `application-dev.yml`.
+
+Example:
+- `SPRING_DATASOURCE_JDBCURL=jdbc:postgresql://localhost:5432/your_database`
+- `SPRING_DATASOURCE_USERNAME=your_username`
+- `SPRING_DATASOURCE_PASSWORD=your_password`
+
+These secrets are used by the workflow to run tests, build the native executable, and package the installer.
 
 ## Demo Video
 [Watch demo](https://drive.google.com/file/d/1pB09Dx_yZi2xPBBKaJPoTiz0n7HcAt6M/view)
@@ -129,6 +179,7 @@ This example uses Hibernate and HikariCP directly. It does not include Spring Bo
 ## References
 - [Gluon with Spring Boot example](https://github.com/cnico/GluonWithSpring/tree/main)
 - [GraalVM Reachability Metadata](https://github.com/oracle/graalvm-reachability-metadata/tree/master)
+- [In-depth HikariCP configurations](https://oneuptime.com/blog/post/2025-07-02-java-hikaricp-connection-pooling/view)
 
 ## License
 This project is licensed under the MIT License.
